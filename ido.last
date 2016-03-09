@@ -1,0 +1,64 @@
+;;; -*- coding: utf-8 -*-
+
+;; ----- ido-last-directory-list -----
+(
+ ("/Users/" . "caesar/")
+ ("/Users/caesar/.emacs.d/" . "elisp/")
+ ("/Users/caesar/Code/Clojure/cg/" . "src/")
+ ("/Users/caesar/Code/Clojure/" . "cg/")
+ ("/Users/caesar/Code/Emacs/" . "dot-files/")
+ ("/Users/caesar/Code/" . "Emacs/")
+ ("/Users/caesar/" . "emacscopy/")
+)
+
+;; ----- ido-work-directory-list -----
+(
+ "/Users/caesar/emacscopy/"
+ "/Users/caesar/.emacs.d/elisp/"
+ "/Users/caesar/Code/Clojure/cg/src/"
+ "/Users/caesar/"
+ "/Users/caesar/.emacs.d/"
+ "/Users/caesar/Code/Emacs/dot-files/"
+)
+
+;; ----- ido-work-file-list -----
+(
+ "drew.el"
+ "init-clojure.el"
+ "parse.clj"
+ "init-main.el"
+ "init-client.el"
+ "init-mode-line.el"
+ "init-f2.el"
+ "init-org-mode.el"
+ ".emacs"
+ "init-support.el"
+)
+
+;; ----- ido-dir-file-cache -----
+(
+ ("/Users/caesar/emacscopy/" (22239 59940 0 0) "tmp/" "smex-items" "README.md" "packs/" "manifest.el" "LICENSE.txt" "lib/" "installer/" "init.el" "ido.last" "etc/" "elpa/" "drew.el" "CHANGELOG.md" "auto-save-list/" ".gitmodules" ".gitignore" ".git/" "#drew.el#" "../" "./")
+
+ ("/Users/caesar/.emacs.d/elisp/" (22239 60414 0 0) "shell-script-funcs.el" "ox-confluence.el" "line-move.el" "init-support.el" "init-org-mode.el" "init-mode-line.el" "init-main.el~" "init-main.el" "init-mac.el" "init-linux.el" "init-fixes.el" "init-f2.el" "init-eshell.el" "init-clojure.el" "init-client.el" "init-browser.el" "init-blog.el" "cider-always-eval.el" "../" "./")
+
+ ("/Users/" (22160 10860 0 0) "Shared/" "caesar/" "backupadmin/" ".localized" "../" "./")
+
+ ("/Users/caesar/.emacs.d/" (22239 59940 0 0) "snippets/" "smex-items" "recentf" "projectile-bookmarks.eld" "ido.last" "elpa/" "elisp/" "custom.el~" "custom.el" "backups/" "auto-save-list/" "ac-dict/" "../" "./")
+
+ ("/Users/caesar/Code/Clojure/cg/" (22239 59508 0 0) "test/" "target/" "src/" "resources/" "README.md" "project.clj" "dev-resources/" "dev/" "config.edn" "cg.iml" ".nrepl-port" ".idea/" ".gitignore" ".git/" "../" "./")
+
+ ("/Users/caesar/" (22239 56732 0 0) "Untitled1.ipynb" "Untitled.ipynb" "scripts/" "Public/" "Pictures/" "pgadmin.log" "npm-debug.log" "Music/" "Movies/" "miniconda2/" "Library/" "kubectl" "index.html" "FuckingWithStarCluster/" "emacscopy/" "Dropbox/" "drewatamys.pub" "drewatamys" "Downloads/" "Documents/" "Desktop/" "Code/" "bin/" "Applications/" ".w3m/" ".Trash/" ".tor/" ".subversion/" ".starcluster/" ".ssh/" ".rnd" ".python_history" ".putty/" ".psql_history" ".profile" ".pia_manager_crash.log" ".pia_manager/" ".pgpass" ".oracle_jre_usage/" ".npm/" ".node-gyp/" ".natal_history" ".m2/" ".live-packs/" ".lein_history" ".lein/" ".kube/" ".jupyter/" ".jline-org.codehaus.groovy.tools.shell.Main.history" ".ipython/" ".ipynb_checkpoints/" ".IdeaIC15/" ".htoprc" ".groovy/" ".gremlin_groovy_history" ".gnupg/" ".gitconfig" ".emacs~" ".emacs.d/" ".emacs-live.el~" ".emacs-live.el" ".emacs" ".DS_Store" ".dropbox/" ".docker/" ".curlrc" ".ctags" ".counterplay/" ".continuum/" ".config/" ".conda/" ".cocoapods/" ".CFUserTextEncoding" ".cassandra/" ".bash_sessions/" ".bash_profile-miniconda2.bak" ".bash_profile" ".bash_history" ".babel.json" ".agignore" "../" "./")
+
+ ("/Users/caesar/Code/Clojure/cg/src/" (22239 54805 0 0) "parse.clj" "models.clj" "localschema.clj" "cypher.clj" "cg.clj" "../" "./")
+
+ ("/Users/caesar/Code/Emacs/dot-files/" (22239 51537 0 0) "zsh-theme.org" "zsh-rc.org" "zsh-env.org" "vimrc" "viminfo" "templates/" "snippets/" "sh-functions.org" "server/" "README.md" "profile.org" "emacs.org" "emacs-web.org" "emacs-support.org" "emacs-server.org" "emacs-scala.org" "emacs-ruby.org" "emacs-python.org" "emacs-org.org" "emacs-mode-line2.org" "emacs-mode-line.org" "emacs-mail.org" "emacs-mac.org" "emacs-linux.org" "emacs-javascript.org" "emacs-fixes.org" "emacs-f2.org" "emacs-eshell.org" "emacs-emms.org" "emacs-elfeed.org" "emacs-clojure.org" "emacs-client.org" "emacs-browser.org" "emacs-blog.org" "elisp/" "build.el" "bin/" "babel/" ".gitignore" ".git/" "../" "./")
+
+ ("/Users/caesar/Code/Clojure/" (22231 12575 0 0) "wren-relsys/" "npm-debug.log" "matc/" "hairy/" "fsw/" "drewscool/" "cp/" "cljs.jar" "cljfighter/" "cljf/" "cg/" "bkkhack/" "applebottom/" ".DS_Store" "../" "./")
+
+ ("/Users/caesar/Code/Emacs/" (22239 46962 0 0) "dot-files/" ".DS_Store" "../" "./")
+
+ ("/Users/caesar/Code/" (22239 41488 0 0) "Titan/" "python/" "Octave/" "ML/" "miniconda/" "math4ml.pdf" "Keys/" "Insitu cover letter.pdf" "Heritrix/" "Haskell/" "Fucking/" "Emacs/" "DiscreteStructures.pdf" "Datomic/" "Daily/" "Clojure/" "apache-cassandra-3.2/" ".DS_Store" "../" "./")
+)
+
+;; ----- ido-unc-hosts-cache -----
+t

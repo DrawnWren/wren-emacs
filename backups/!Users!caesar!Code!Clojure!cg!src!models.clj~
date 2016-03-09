@@ -1,0 +1,99 @@
+(ns models
+  (:require [clojurewerkz.neocons.rest :as nr]
+            [clojurewerkz.neocons.rest.nodes :as nn]
+            [clojurewerkz.neocons.rest.relationships :as nrl]
+            [clojurewerkz.neocons.rest.labels :as nl]
+            [clojurewerkz.neocons.rest.constraints :as nc]
+            [clojurewerkz.neocons.rest.cypher :as cypher]
+            [schema.core :as s]
+            [cypher :as cy]
+            [clojure.string :refer (replace-first trim)]
+            [manifold.stream :as st]
+            [clojure.core.async :refer (go)]
+            [localschema :as z]))
+
+(defn unique-constraints
+  "Adds uniqueness constraints to the db."
+  [conn]
+
+  (do
+    (nc/create-unique conn "TAG" :name)
+    (nc/create-unique conn "VIDEO" :url)))
+
+(s/defn ^:always-validate create-video
+  "Creates a video in N4J and adds the video label to it."
+  [conn vid :- z/video-schema]
+
+  (->> vid
+       (nn/create conn)
+       #(nl/add conn % ["VIDEO"])))
+
+
+
+(s/defn ^:always-validate batch-create-tag
+  "Batch creates a tag vertex in N4J and adds the tag label to it"
+  [conn tags]
+  (println "TAGS count " (count tags))
+  (let [cTime (System/currentTimeMillis)
+        tagbatch (nn/create-batch conn tags)]
+    (println "TAGS batch add took " (- (System/currentTimeMillis) cTime))
+    (doall (map #(nl/add conn % ["TAG"]) tagbatch))))
+
+(s/defn batch-create-video
+  "Batch creates a video in N4J and adds the video label to them."
+  [conn videos :- [z/video-schema]]
+  (println "VIDEOS count " (count videos))
+  (let [cTime (System/currentTimeMillis)
+        vidbatch (nn/create-batch conn videos)]
+    (println "VIDEOS batch add took " (- (System/currentTimeMillis) cTime))
+    (doall (map #(nl/add conn % ["VIDEO"]) vidbatch))))
+
+
+;;##Working
+;;MERGE (tagname:TAG),(boobs:TAG)
+;;RETURN tagname, boobs
+(s/defn batch-upsert-video-tag!
+  [conn tags :- [z/tag-schema]]
+  (let [tagnames (->> tags
+                      (map :name))
+        merge-q (->> (map (fn [a] (str "(" a ":TAG),")) tagnames)
+                     (apply str "MERGE "))
+        return-q (->> tagnames
+                      (map (fn [a] (str a ", ")))
+                      (apply str "RETURN "))]
+
+    (cypher/query conn merge-q)))
+
+(s/defn upsert-tag
+  "Takes a tag name and a connection, returns a tag node. MERGE?"
+  [conn tag]
+  (let [name (:name tag)
+        q (str "MERGE (" name ":TAG) RETURN " name)]
+      (cypher/query conn q)))
+
+(defn create-vidtag
+  [conn {:keys [video tag weight] :as vidtag :- z/single-vidtag}]
+  nil
+  )
+
+
+(defn batch-create-video-with-vidtag
+  "Takes a DB connection, a stream, and a batch size. Pulls videos off of the stream, batches them, and transacts them to the db. Recursively calls itself until the stream is empty or contains the keyword :exit"
+  [conn stream batch]
+  (loop [i 0
+         quer ""]
+    (let [vid @(st/take! stream)]
+      (if (or (= vid :exit) (= vid nil))
+        "Done!"
+        (if (> i batch)
+          (do
+            (cypher/query conn quer)
+            (batch-create-video-with-vidtag conn stream batch))
+          (recur (inc i)  (str quer (str (cy/create-video-with-vidtag vid) ";"))))))))
+
+
+;;##To delete shit
+
+(defn create-node
+  [conn node]
+ (nn/create conn node))

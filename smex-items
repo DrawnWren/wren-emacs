@@ -1,0 +1,29 @@
+
+;; ----- smex-history -----
+(
+ cider-interrupt
+ eval-expression
+ clojure-mode
+ list-packages
+ package-refresh-contents
+ toggle-debug-on-error
+ debug
+)
+
+;; ----- smex-data -----
+(
+ (package-install . 3)
+ (list-packages . 6)
+ (package-refresh-contents . 14)
+ (org-mode . 1)
+ (load-theme . 3)
+ (set-face-font . 1)
+ (set-frame-font . 1)
+ (eval-expression . 10)
+ (version . 1)
+ (package-list-packages . 1)
+ (toggle-debug-on-error . 3)
+ (debug . 2)
+ (clojure-mode . 1)
+ (cider-interrupt . 1)
+)

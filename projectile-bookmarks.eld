@@ -1,0 +1,1 @@
+("~/Code/Clojure/cg/" "~/emacscopy/" "~/Code/Emacs/dot-files/")

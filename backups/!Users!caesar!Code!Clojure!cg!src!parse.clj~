@@ -1,0 +1,206 @@
+(ns parse
+  (:require [models :as m]
+            [schema.core :as s]
+            [localschema :as z]
+            [manifold.stream :as st]
+            [clojure.core.async :refer (go)]))
+
+;;;Utility Fns
+(defn read-file
+  "Str -> Seq
+  Returns a nested seq of line of file"
+  [file]
+  (with-open [rdr (clojure.java.io/reader file)]
+    (if-let [a (line-seq rdr)] (doall a) (println "Empty file passed to parse/readFile."))))
+
+(defn spit-out
+  "Spits a line to a file as a new line appended to the end of the file."
+  [f s]
+  (spit f (str s "\n") :append true))
+
+(def naughtylist '("about" "above" "after" "again" "against" "all" "and" "any" "are" "because" "been" "before" "being" "below" "between" "both" "but" "cannot" "could" "did" "does" "doing" "down" "during" "each" "few" "for" "from" "further" "had" "has" "have" "having" "her" "here" "hers" "herself" "him" "himself" "his" "how" "into" "its" "itself" "more" "most" "myself" "nor" "not" "off" "once" "only" "other" "ought" "our" "ours" "ourselves" "out" "over" "own" "same" "shan" "she" "should" "some" "such" "than" "that" "the" "their" "theirs" "them" "themselves" "then" "there" "these" "they" "this" "those" "through" "to" "too" "under" "until" "up" "very" "was" "we" "we" "were" "what" "when" "where" "which" "while" "who" "whom" "why" "with" "would" "you" "your" "yours" "yourself" "yourselve"))
+
+(defn checktags
+  "Returns true if word is good."
+  [word]
+  (not (some {word true} naughtylist)))
+
+;;;Parse Fns
+(defn ph-parser
+  "Str -> [Strs]
+  Accepts one line of the pornhub DB (in) and returns
+  [video ID, the title and a vector of the keywords]"
+  [in]
+
+  (let [b (->> (clojure.string/split in #"\|")
+               (remove #(re-find #"image.pornhub" %)))
+        phid (vector (subs (re-find #"embed\/\w+" (first b)) 6))]
+    (concat '() phid (rest b))))
+
+(s/defn ^:always-validate format-video-tokens :- z/video-with-tags-schema
+  "(Strings) -> nothing
+  Accepts a partially parsed list of strings, Returns a video hash."
+  [video]
+
+  (let [vm (assoc {} :url  (str "http://www.pornhub.com/"
+                                (nth video 0)), :title (nth video 1), :hub-code "PH",
+                                :tags '(), :length (Long/parseLong (nth video 5)))
+        kws (nth video 2)
+                                        ;cat (nth video 3)  ##I'm not sure why I stopped using categories. Possibly, they're already included in KW?
+
+        ctags (->> #";"
+                   (clojure.string/split kws)
+                   (flatten)
+                   (filter #(->> %
+                                 .length
+                                 (< 2)))
+                   (filter checktags)
+                   (map clojure.string/lower-case))
+        vn (assoc vm :tags ctags)]
+    vn))
+
+
+(defn ph-combo [in]
+  (->> in
+       ph-parser
+       format-video-tokens))
+
+(s/defn video-tag-weight [title tags]
+  (-> tags
+      (conj title)
+      frequencies))
+
+(s/defn ^:always-validate tag-weights-for-video :- [z/tag-weight-schema]
+  "Takes a video map that complies to the video-schema and returns a
+  list of tags conforming to the tag-schema."
+  [{:keys [tags title] :as video :- z/video-with-tags-schema}]
+  (let [formatted-title (clojure.string/split
+                         (clojure.string/lower-case title) #" ")
+        weights (video-tag-weight title tags)]
+    (for [tag tags
+          :let [weight (get weights tag)]]
+      [tag weight])))
+
+(defn graph-batch
+  "Takes a connection and a list of videos, sends them to
+  create-video-with-vidtag to format a single large query and then shove
+  it in."
+  [vids ch]
+  (doall
+   (for [vid vids]
+     (let [vidmap (ph-combo vid)
+           vidnode (dissoc vidmap :tags)
+           tagweights (tag-weights-for-video vidmap)
+           final-v (assoc {} :video vidnode :tags tagweights)]
+       final-v))))
+
+(def vid-count (atom 1))
+
+ (defn ph->graph-files
+  "Accepts a PH dump formatted in-file and a session. Writes the video
+  and tag vertices to the db. Does this by calling ph-combo on each line
+  of in, conjing the results in a list of length $batch. Only takes $count videos. "
+  [conn in count batch]
+  (with-open [rdr (clojure.java.io/reader in)]
+    (let [batched-vids (->> rdr
+                           (line-seq)
+                           (take count)
+                           (partition-all batch))
+          graph-stream (st/stream)
+
+          ;;instead of mapping video batch and later adding tags.
+          ;;need to get the video node, get the tag nodes and make
+          ;;the relationships all in one go.
+          ;;so that (add-video conn video) adds a video, all the
+          ;;appropriate tags and then adds the relationships w/ weights
+          ;;will use tag-index as {tag node, tag node}
+          pgraph (partial graph-batch conn)
+          vids (map pgraph batched-vids)]
+      ;;##Working on adding asynchronous streaming to this
+      ;;## I want batch-create-video-with-vidtag to take from a chan continuously
+      ;; and this fun to put to a chan continuously
+      (for [v vids]
+        (do
+          (println "!!Batch " @vid-count)
+          (swap! vid-count inc)
+          (map deref v))))))
+
+
+;;;VidTag Edges below
+#_ (defn parse-one-vidtag [vid]
+  (let [a {:video-id (:db/id vid)}
+        cv (clojure.string/split
+            (clojure.string/lower-case (get vid :video/title)) #" ")]
+
+    (for [tag (:video/tags vid)]
+      (let [tn (get tag :tag/name)
+            tid (get tag :db/id)
+            r  (assoc a :tag-id tid,
+                      :weight (float (+ 1 (count (filter #(= tn %) cv)))))]
+        r))))
+
+
+#_ (defn initialize-all-vidtags-c!
+  [conn vid-list b]
+  (let [base-time (System/currentTimeMillis)]
+    (doseq [vids (->> vid-list
+                      (partition-all b))]
+      (let [t (System/currentTimeMillis)]
+        (->> vids
+             (pmap parse-one-vidtag)
+             (apply concat)
+             (doall)
+             (m/batch-upsert-video-tag! conn))
+        (println "Total time " (- (System/currentTimeMillis) base-time) " ** Write time " (- (System/currentTimeMillis) t))))))
+
+
+;;To be deleted
+#_ (defn graph-batch
+  "Accepts a list of batched videos, processes them, and returns a video hash,
+  calls tag-nodes to update global tagstate."
+  [conn vids]
+
+  ;;##ph->graph-files expects a future to deref from here
+  ;;## I could use a chan to move information between this fn and ph->graph-files
+
+  (doseq [vid vids]
+    (let [vidmap (ph-combo vid)
+
+          vidnode (->> (dissoc vidmap :tags) (m/create-video conn))
+
+          tagmap (tag-weights-for-video conn vidmap) ;;##I don't think this works
+
+          results (assoc {} :video vidnode :tags tagmap)]
+
+      (future (make-edges conn results)))))
+
+
+#_ (defn write-tags!
+  "Pretty sure I won't need this"
+  [conn tags batch]
+  (let [tagfun (partial m/batch-create-tag conn)
+        tagbatch (->> tags
+                      (map (fn [a] {:name a}))
+                      (partition-all batch)
+                      (pmap #(future (tagfun %)))
+                      (map deref)
+                      (doall))]))
+#_ (s/defn ^:always-validate make-edges
+  [conn {:keys [video tags :as tw :- z/tag-and-video-schema]}]
+  ;;create new edge for $video -[HAS_TAG]-> $tag and set WEIGHT = $tagweight
+  ;;at this point, video should be a video node representation and tag should be
+  ;; [$tagnode $weight]
+  (for [tag tags]
+    (let [[node weight] tag
+          q-map {:video video :tag node :weight weight}]
+      (m/create-vidtag conn q-map))))
+
+#_ (s/defn new-tag-to-db
+  "Accepts a connection and a tag. Returns the tag-node and swaps the
+{tag node} relationship into the tag-index atom."
+  [conn tag]
+  (let [node [m/upsert-tag conn tag]]
+    (swap! tag-index assoc tag node)
+    node))
+
+#_ (def tag-index (atom {}))
