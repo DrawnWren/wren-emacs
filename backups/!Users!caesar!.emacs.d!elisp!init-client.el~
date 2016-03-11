@@ -27,7 +27,7 @@ If WINDOW is the only one in its frame, then `delete-frame' too."
     (kill-buffer)
     (if (one-window-p t)
         (delete-frame)
-        (delete-window (selected-window)))))
+      (delete-window (selected-window)))))
 
 ;; Font Settings
 
@@ -49,7 +49,8 @@ If WINDOW is the only one in its frame, then `delete-frame' too."
 
 
 (defvar ha/fixed-font-family
-  (cond ((x-list-fonts "Hasklig")         "Hasklig")
+  (cond ((x-list-fonts "Inconsolata")     "Inconsolata")
+        ((x-list-fonts "Hasklig"          "Hasklig"))
         ((x-list-fonts "Source Code Pro") "Source Code Pro")
         ((x-list-fonts "Anonymous Pro")   "Anonymous Pro")
         ((x-list-fonts "M+ 1mn")          "M+ 1mn"))
@@ -63,7 +64,7 @@ If WINDOW is the only one in its frame, then `delete-frame' too."
 
 (when ha/fixed-font-family
   (set-frame-font ha/fixed-font-family)
-  (set-face-attribute 'default nil :font ha/fixed-font-family :height 150)
+  (set-face-attribute 'default nil :font ha/fixed-font-family :height 140)
   (set-face-font 'default ha/fixed-font-family))
 
 
@@ -91,7 +92,7 @@ If WINDOW is the only one in its frame, then `delete-frame' too."
   :ensure t
   :init (require 'color-theme)
   :config (use-package color-theme-sanityinc-tomorrow
-           :ensure t))
+            :ensure t))
 
 
 
@@ -105,7 +106,7 @@ If WINDOW is the only one in its frame, then `delete-frame' too."
   (interactive)
   (custom-set-faces
    '(org-block-begin-line
-    ((t (:underline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
+     ((t (:underline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
    '(org-block-background
      ((t (:background "#FFFFEA"))))
    '(org-block
@@ -138,10 +139,7 @@ If WINDOW is the only one in its frame, then `delete-frame' too."
 ;; particularly in how the headers are larger, instead of different
 ;; colors.
 
-
 (deftheme ha/org-theme "Sub-theme to beautify org mode")
-
-
 
 ;; Since I’m using the Powerline project, switching my Emacs color
 ;; theme, requires me to call =powerline-reset= in order to get the
@@ -187,8 +185,8 @@ If WINDOW is the only one in its frame, then `delete-frame' too."
 
 
 (if (equal "howard.abrams" user-login-name)
-  (ha/change-theme 'color-theme-sanityinc-tomorrow-day
-                   'org-src-color-blocks-light)
+    (ha/change-theme 'color-theme-sanityinc-tomorrow-day
+                     'org-src-color-blocks-light)
   (ha/change-theme 'color-theme-sanityinc-tomorrow-night
                    'org-src-color-blocks-dark))
 
@@ -255,36 +253,7 @@ If no width is specified, it defaults to ~ 80 characters."
 
 ;; The bell is pretty obnoxious when it dings during scrolling.
 
-
 (setq ring-bell-function 'ignore)
-
-;; Twitter
-
-;;   I know, I know, reading my [[http://www.emacswiki.org/emacs-en/TwitteringMode][twitter feed in Emacs]] is pretty geeking
-;;   awesome. And I can filter out tweets that match a pattern that annoys me:
-
-
-(use-package twittering-mode
-  :init
-  (setq twittering-tweet-filters '("NPR" "#burritowatch"))
-
-  (defun twittering-filter-tweets ()
-    "Call string-match on all new tweets"
-    (setq non-matching-statuses '())
-    (dolist (status twittering-new-tweets-statuses)
-      (setq matched-tweets 0)
-      (dolist (pat twittering-tweet-filters)
-        (if (string-match pat (cdr (assoc 'text status)))
-            (setq matched-tweets (+ 1 matched-tweets))))
-      (if (= 0 matched-tweets)
-          (setq non-matching-statuses
-                (append non-matching-statuses `(,status)))))
-    (setq new-statuses non-matching-statuses))
-
-  (add-hook 'twittering-edit-mode-hook 'flyspell-mode)
-  (add-hook 'twittering-new-tweets-hook 'twittering-filter-tweets))
-
-;; Notice "Windows" is not listed. That is by design.
 
 ;; Make sure that we can simply =require= this library.
 

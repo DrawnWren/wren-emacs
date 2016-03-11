@@ -49,7 +49,8 @@ If WINDOW is the only one in its frame, then `delete-frame' too."
 
 
 (defvar ha/fixed-font-family
-  (cond ((x-list-fonts "Hasklig")         "Hasklig")
+  (cond ((x-list-fonts "Inconsolata")     "Inconsolata")
+        ((x-list-fonts "Hasklig"          "Hasklig"))
         ((x-list-fonts "Source Code Pro") "Source Code Pro")
         ((x-list-fonts "Anonymous Pro")   "Anonymous Pro")
         ((x-list-fonts "M+ 1mn")          "M+ 1mn"))
@@ -63,7 +64,7 @@ If WINDOW is the only one in its frame, then `delete-frame' too."
 
 (when ha/fixed-font-family
   (set-frame-font ha/fixed-font-family)
-  (set-face-attribute 'default nil :font ha/fixed-font-family :height 150)
+  (set-face-attribute 'default nil :font ha/fixed-font-family :height 140)
   (set-face-font 'default ha/fixed-font-family))
 
 
@@ -150,7 +151,7 @@ If WINDOW is the only one in its frame, then `delete-frame' too."
 (defun ha/change-theme (theme org-block-style)
   "Changes the color scheme and reset the mode line."
   (funcall theme)
-  (powerline-reset)
+  ;;(powerline-reset)
   (funcall org-block-style)
 
   (let* ((ha/fixed-font-tuple (list :font ha/fixed-font-family))

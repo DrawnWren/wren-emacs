@@ -160,7 +160,7 @@
 ;;    My [[file:emacs-mode-line.org][mode-line code]] is now more complex in order to make it more simpler.
 
 
-(require 'init-mode-line)
+;;(require 'init-mode-line)
 
 ;; Whitespace Mode
 
@@ -517,7 +517,7 @@ particular width."
   :ensure t
   :commands avy-goto-word-1 avy-goto-char-1 avy-goto-line avy-goto-char-timer
   :bind
-  ("C-c j"   . avy-goto-word-1)
+  ("C-o"   . avy-goto-word-1)
   ("C-c k k" . avy-goto-char-timer)
   ("C-c k j" . avy-goto-word-1)
   ("C-c k c" . avy-goto-char-1)

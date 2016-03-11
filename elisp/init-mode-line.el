@@ -1,32 +1,3 @@
-;; Which Function Mode
-
-;;   While this might make my mode line a bit too cluttered, I like
-;;   having the name of the function (or org-mode header) on the line:
-
-
-(setq which-func-unknown "")
-(which-function-mode 1)
-
-
-
-;; Let's "fix" the output of the function based on my mode line:
-
-
-(setq which-func-format
-      `(" "
-        (:propertize which-func-current local-map
-                     (keymap
-                      (mode-line keymap
-                                 (mouse-3 . end-of-defun)
-                                 (mouse-2 . narrow-to-defun)
-                                 (mouse-1 . beginning-of-defun)))
-                     face which-func
-                     mouse-face mode-line-highlight
-                     help-echo "mouse-1: go to beginning\n\
-mouse-2: toggle rest visibility\n\
-mouse-3: go to end")
-        " "))
-
 ;; PowerLine
 
 ;;   The [[http://www.emacswiki.org/emacs/PowerLine][PowerLine]] project can really clean up the mode line, but I'm
@@ -35,7 +6,7 @@ mouse-3: go to end")
 
 
 (use-package powerline
-   :ensure t)
+  :ensure t)
 
 
 
@@ -68,8 +39,8 @@ mouse-3: go to end")
 ;;          (news2 (replace-regexp-in-string "FlyC" fly-c news1)))
 
 (defun powerline-simpler-minor-display (s)
-    (replace-regexp-in-string
-     (concat " " (mapconcat 'identity '("񓵸" "Projectile" "Fill" "BufFace") "\\|")) "" s))
+  (replace-regexp-in-string
+   (concat " " (mapconcat 'identity '("񓵸" "Projectile" "Fill" "BufFace") "\\|")) "" s))
 
 (defun powerline-ha-theme ()
   "A powerline theme that removes many minor-modes that don't serve much purpose on the mode-line."
