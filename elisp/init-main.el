@@ -86,9 +86,8 @@
 (setq package-archives '(("org"       . "http://orgmode.org/elpa/")
                          ("gnu"       . "http://elpa.gnu.org/packages/")
                          ("melpa"     . "http://melpa.milkbox.net/packages/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")
-                         ("melpa-stable" . "https://stable.melpa.org/packages/")))
-(setq )
+                         ("marmalade" . "http://marmalade-repo.org/packages/")))
+
 (package-initialize)
 
 
@@ -141,11 +140,6 @@
 
 ;; Display Settings
 
-;;   I've been using Emacs for many years, and appreciate a certain
-;;   minimalist approach to its display. While you can turn these off
-;;   with the menu items now, it is just as easy to set them here.
-
-
 (setq initial-scratch-message "") ;; Uh, I know what Scratch is for
 (setq visible-bell t)             ;; Get rid of the beeps
 
@@ -156,10 +150,7 @@
   (scroll-bar-mode -1))            ;; Scrollbars are waste screen estate
 
 ;; Mode Line
-
 ;;    My [[file:emacs-mode-line.org][mode-line code]] is now more complex in order to make it more simpler.
-
-
 ;;(require 'init-mode-line)
 
 ;; Whitespace Mode
@@ -195,66 +186,18 @@
 ;; Hydra Sequences
 
 ;;    I’m starting to appreciate the [[https://github.com/abo-abo/hydra][Hydra project]].
+;;    Moved to its own file.
 
-
-(use-package hydra
-  :ensure t
-  :config
-  (hydra-add-font-lock))
-
-
+(require 'init-hydra)
 
 ;; Easily manipulate the size of the windows using the arrow keys in a
 ;; particular buffer window.
-
-
-(require 'windmove)
-
-(defun hydra-move-splitter-left (arg)
-  "Move window splitter left."
-  (interactive "p")
-  (if (let ((windmove-wrap-around))
-        (windmove-find-other-window 'right))
-      (shrink-window-horizontally arg)
-    (enlarge-window-horizontally arg)))
-
-(defun hydra-move-splitter-right (arg)
-  "Move window splitter right."
-  (interactive "p")
-  (if (let ((windmove-wrap-around))
-        (windmove-find-other-window 'right))
-      (enlarge-window-horizontally arg)
-    (shrink-window-horizontally arg)))
-
-(defun hydra-move-splitter-up (arg)
-  "Move window splitter up."
-  (interactive "p")
-  (if (let ((windmove-wrap-around))
-        (windmove-find-other-window 'up))
-      (enlarge-window arg)
-    (shrink-window arg)))
-
-(defun hydra-move-splitter-down (arg)
-  "Move window splitter down."
-  (interactive "p")
-  (if (let ((windmove-wrap-around))
-        (windmove-find-other-window 'up))
-      (shrink-window arg)
-    (enlarge-window arg)))
-
-(defhydra hydra-splitter (global-map "<f9>")
-  "splitter"
-  ("<left>" hydra-move-splitter-left)
-  ("<down>" hydra-move-splitter-down)
-  ("<up>" hydra-move-splitter-up)
-  ("<right>" hydra-move-splitter-right))
 
 ;; Displaying Command Sequences
 
 ;;    Many command sequences may be logical, but who can remember them
 ;;    all? Use [[https://github.com/kai2nenobu/guide-key][guide-key]] to display the final function name. This isn't
 ;;    as nice as Hydra, but useful for built-in key sequences:
-
 
 (use-package guide-key
   :ensure t
@@ -541,11 +484,12 @@ particular width."
 ;; General Behavior Fixes
 
 ;;    The subtle changes I've been making to Emacs behavior has grown
-;;    until I felt I should move it into [[file:emacs-fixes.org][its own source file]].
+;;    until I felt I should move it into [[file:emacs-fixes.org][its
+;;    own source file]].
 
 
 (require 'init-fixes)
-
+n
 ;; Multiple Cursors
 
 ;;    While I'm not sure how often I will use [[https://github.com/emacsmirror/multiple-cursors][multiple-cursors]] project,
@@ -790,8 +734,8 @@ This function also supports some org-mode wrappers:
 
 
 (use-package find-dired
-   :ensure t
-   :init (setq find-ls-option '("-print0 | xargs -0 ls -od" . "-od")))
+  :ensure t
+  :init (setq find-ls-option '("-print0 | xargs -0 ls -od" . "-od")))
 
 
 
@@ -866,10 +810,10 @@ user."
 
 
 (use-package flx-ido
-   :ensure t
-   :init (setq ido-enable-flex-matching t
-               ido-use-faces nil)
-   :config (flx-ido-mode 1))
+  :ensure t
+  :init (setq ido-enable-flex-matching t
+              ido-use-faces nil)
+  :config (flx-ido-mode 1))
 
 
 
@@ -893,7 +837,7 @@ user."
   :ensure t
   :init (smex-initialize)
   :bind ("M-x" . smex)
-        ("M-X" . smex-major-mode-commands))
+  ("M-X" . smex-major-mode-commands))
 
 ;; Helm
 
@@ -904,7 +848,7 @@ user."
 (use-package helm
   :ensure t
   :init (add-to-list 'guide-key/guide-key-sequence "C-x c")
-  (use-package helm-config))   ;; Binds C-x c to the helm bidness.
+  (use-package helm-config));; Binds C-x c to the helm bidness.
 
 
 
@@ -1121,7 +1065,7 @@ With prefix P, create local abbrev. Otherwise it will be global."
 (use-package abbrev
   :bind ("C-c T a" . abbrev-mode)
   :init (setq save-abbrevs t)
-        (setq-default abbrev-mode t)
+  (setq-default abbrev-mode t)
   :diminish abbrev-mode)
 
 
@@ -1184,8 +1128,8 @@ to maximize the screen estate."
     (fringe-mode '(8 . 0))
     (linum-mode 1)))
 
-  (global-set-key (kbd "A-C-K") 'linum-off-mode)
-  (global-set-key (kbd "s-C-K") 'linum-off-mode)  ;; For Linux
+(global-set-key (kbd "A-C-K") 'linum-off-mode)
+(global-set-key (kbd "s-C-K") 'linum-off-mode)  ;; For Linux
 
 
 
@@ -1208,7 +1152,7 @@ to maximize the screen estate."
       (linum-mode 1)))
 
   :bind ("A-k" . linum-new-mode)
-        ("s-k" . linum-new-mode))   ;; For Linux
+  ("S-k" . linum-new-mode))   ;; For Linux
 
 ;; Breadcrumbs
 
@@ -1230,7 +1174,6 @@ to maximize the screen estate."
   :ensure t
   :bind (("M-p" . goto-last-change)
          ("M-n" . goto-last-change-reverse)))
-
 
 
 ;; Use =C-u 0 M-p= shows a description of the change you made at each point.
@@ -1366,7 +1309,7 @@ to maximize the screen estate."
 (use-package imenu+
   :ensure t
   :init (add-hook 'prog-mode-hook 'imenup-add-defs-to-menubar)
-        (add-hook 'org-mode-hook  'imenup-add-defs-to-menubar))
+  (add-hook 'org-mode-hook  'imenup-add-defs-to-menubar))
 
 
 
@@ -1391,19 +1334,7 @@ to maximize the screen estate."
 ;; with the TAGS file for all functions in the project:
 
 
-(use-package ido
-  :config
-  (defun ido-find-tag ()
-    "Find a tag using ido"
-    (interactive)
-    (tags-completion-table)
-    (let (tag-names)
-      (mapatoms (lambda (x)
-                  (push (prin1-to-string x t) tag-names))
-                tags-completion-table)
-      (find-tag (ido-completing-read "Tag: " tag-names))))
 
-  (global-set-key (kbd "C-c I") 'ido-find-tag))
 
 
 
@@ -1514,7 +1445,7 @@ modifications)."
 (use-package color-identifiers-mode
   :ensure t
   :init
-    (add-hook 'emacs-lisp-mode-hook 'color-identifiers-mode)
+  (add-hook 'emacs-lisp-mode-hook 'color-identifiers-mode)
   :diminish color-identifiers-mode)
 
 
@@ -1543,7 +1474,7 @@ modifications)."
   :ensure t
   :diminish paredit-mode
   :init
-    (add-hook 'emacs-lisp-mode-hook 'paredit-mode))
+  (add-hook 'emacs-lisp-mode-hook 'paredit-mode))
 
 ;; Colored Variables
 
@@ -1715,13 +1646,12 @@ modifications)."
 ;;    fonts and whatnot, call the 'mac' stuff... which will still work
 ;;    for Linux too.
 
-(require 'init-clojure)
-
 (if (window-system)
     (require 'init-client)
   (require 'init-server))
 
+;;Require Clojure settings
+(require 'init-clojure)
+
 ;; After the first load, we can reload this with a require:
-
-
 (provide 'init-main)

@@ -1,3 +1,4 @@
+
 (use-package clojure-mode
   :ensure t
   :init
@@ -6,7 +7,8 @@
       ("__"   . ?⁈)))
 
   :config
-  (add-hook 'clojure-mode-hook 'global-prettify-symbols-mode))
+  (add-hook 'clojure-mode-hook 'global-prettify-symbols-mode)
+  (add-hook 'clojure-mode-hook 'show-paren-mode))
 
 (use-package color-identifiers-mode
   :ensure t
@@ -70,11 +72,9 @@ to the next parenthesis."
   (cider-switch-to-last-clojure-buffer)
   (message ""))
 
-(defun cider-refresh ()
-  (interactive)
+(defun cider-repl-reset ()
   (cider-switch-to-repl-buffer)
-  (goto-char (point-max))
-  (insert "(refresh)")
+  (cider-insert-in-repl "(refresh)")
   (cider-repl-return))
 
 (use-package cider
@@ -94,15 +94,15 @@ to the next parenthesis."
 
   (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
   (add-hook 'cider-mode-hook 'company-mode)
-
   (add-hook 'cider-repl-mode-hook 'paredit-mode)
   (add-hook 'cider-repl-mode-hook 'superword-mode)
   (add-hook 'cider-repl-mode-hook 'company-mode)
   (add-hook 'cider-test-report-mode 'jcf-soft-wrap)
 
-  (bind-key "C-x C-e" 'cider-eval-last-sexp clojure-mode-map)
-  (bind-key "C-c C-v" 'cider-send-and-evaluate-sexp)
-  (bind-key "C-c r" 'cider-refresh)
+  (bind-keys :map clojure-mode-map
+             ("C-x C-e" . cider-eval-last-sexp)
+             ("C-c r" . cider-repl-reset)
+             ("C-c C-v" . cider-send-and-evaluate-sexp))
 
   :config
   (use-package slamhound))
@@ -133,19 +133,18 @@ to the next parenthesis."
   (add-hook 'clojure-mode-hook 'clj-refactor-mode)
   :config
   ;; Configure the Clojure Refactoring prefix:
-  (cljr-add-keybindings-with-prefix "C-c .")
+  (cljr-add-keybindings-with-prefix "C-c e")
   :diminish clj-refactor-mode)
 
-(use-package hydra
-  :ensure t
-  :config
-  (defhydra hydra-clojure-docs (clojure-mode-map "C-c d" :color blue)
-    "Clojure Documentation"
-    ("f" cider-code "functional")
-    ("g" cider-grimoire "grimoire")
-    ("w" cider-grimoire-web "web examples")
-    ("c" clojure-cheatsheet "cheatsheet")
-    ("d" dash-at-point "dash")))
+
+
+(defhydra hydra-clojure-docs (clojure-mode-map "C-c d")
+  "Clojure Documentation"
+  ("f" cider-code "functional")
+  ("g" cider-grimoire "grimoire")
+  ("w" cider-grimoire-web "web examples")
+  ("c" clojure-cheatsheet "cheatsheet")
+  ("d" dash-at-point "dash"))
 
 
 

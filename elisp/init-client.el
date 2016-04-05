@@ -32,20 +32,7 @@ If WINDOW is the only one in its frame, then `delete-frame' too."
 ;; Font Settings
 
 ;;   I love syntax highlighting.
-
-
 (global-font-lock-mode 1)
-
-
-
-;; Am I really a monospace font slut? I think so. I keep changing my
-;; font based on the monospace du jour... While I [[http://mplus-fonts.sourceforge.jp/mplus-outline-fonts/download/index.html][M+]] because it is
-;; thinner and has more white space between lines, but [[http://blogs.adobe.com/typblography/2012/09/source-code-pro.html][Source Code Pro]]
-;; is so attractive, oh, and then there is Anonymous Pro...
-
-;; While thicker, [[https://github.com/tonsky/FiraCode][Fira]] does symbol ligatures. However, [[https://github.com/i-tu/Hasklig][Hasklig]] is a
-;; nice font that is thinner and easier to read, with /some/ symbolic
-;; ligatures that doesn't interfere with my org-mode header bullets.
 
 
 (defvar ha/fixed-font-family
@@ -183,12 +170,8 @@ If WINDOW is the only one in its frame, then `delete-frame' too."
 ;; And the default startup goes to...night...unless I'm at work, and
 ;; then we'll take the bright shiny theme.
 
-
-(if (equal "howard.abrams" user-login-name)
-    (ha/change-theme 'color-theme-sanityinc-tomorrow-day
-                     'org-src-color-blocks-light)
-  (ha/change-theme 'color-theme-sanityinc-tomorrow-night
-                   'org-src-color-blocks-dark))
+(ha/change-theme 'color-theme-sanityinc-tomorrow-night
+                 'org-src-color-blocks-dark)
 
 
 
