@@ -1,3 +1,4 @@
+;;Everything stolen pretty much directly from Howard Abrams : github.com/howardabrams/dot-files
 (defconst wr/emacs-directory (concat (getenv "HOME") "/.emacs.d/"))
 
 (defun wr/emacs-subdirectory (d) (expand-file-name d wr/emacs-directory))
@@ -112,7 +113,6 @@
   "If the buffer is narrowed, it widens. Otherwise, it narrows intelligently.
 Intelligently means: region, subtree, or defun, whichever applies
 first.
-
 With prefix P, don't widen, just narrow even if buffer is already
 narrowed."
   (interactive "P")
@@ -384,6 +384,25 @@ user."
   (add-hook 'emacs-lisp-mode-hook 'color-identifiers-mode)
   :diminish color-identifiers-mode)
 
+(defun indent-defun ()
+  "Indent current defun.
+  Do nothing if mark is active (to avoid deactivaing it), or if
+  buffer is not modified (to avoid creating accidental
+  modifications)."
+  (interactive)
+  (unless (or (region-active-p)
+              buffer-read-only
+              (null (buffer-modified-p)))
+    (let ((l (save-excursion (beginning-of-defun 1) (point)))
+          (r (save-excursion (end-of-defun 1) (point))))
+      (cl-letf (((symbol-function 'message) #'ignore))
+        (indent-region l r)))))
+
+(defun activate-aggressive-indent ()
+  "Locally add `ha/indent-defun' to `post-command-hook'."
+  (add-hook 'post-command-hook
+            'indent-defun nil 'local))
+
 (use-package lisp-mode
   :init
   (defconst lisp--prettify-symbols-alist
@@ -466,5 +485,7 @@ user."
   (require 'init-server))
 
 (require 'init-clojure)
+
+(require 'init-javascript)
 
 (provide 'init-main)

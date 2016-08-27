@@ -15,6 +15,11 @@
   :init
   (add-hook 'clojure-mode-hook 'color-identifiers-mode))
 
+(use-package rainbow-delimiters
+  :ensure t
+  :init
+  (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
+
 (use-package clojure-mode
   :config
   (define-clojure-indent
@@ -73,9 +78,9 @@ to the next parenthesis."
   (message ""))
 
 (defun cider-repl-reset ()
+  (cider-insert-in-repl "(reset)")
   (cider-switch-to-repl-buffer)
-  (cider-insert-in-repl "(refresh)")
-  (cider-repl-return))
+  (cider-repl-closing-return))
 
 (use-package cider
   :ensure t
@@ -92,7 +97,6 @@ to the next parenthesis."
         ;; Stop error buffer from popping up while working in buffers other than the REPL:
         nrepl-popup-stacktraces nil)
 
-  (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
   (add-hook 'cider-mode-hook 'company-mode)
   (add-hook 'cider-repl-mode-hook 'paredit-mode)
   (add-hook 'cider-repl-mode-hook 'superword-mode)
@@ -116,7 +120,7 @@ to the next parenthesis."
   :init
   (add-hook 'after-init-hook 'global-flycheck-mode)
   :config
-  (use-package flycheck
+  (use-package flychechhk
     :config
     (flycheck-clojure-setup)))
 
@@ -135,17 +139,5 @@ to the next parenthesis."
   ;; Configure the Clojure Refactoring prefix:
   (cljr-add-keybindings-with-prefix "C-c e")
   :diminish clj-refactor-mode)
-
-
-
-(defhydra hydra-clojure-docs (clojure-mode-map "C-c d")
-  "Clojure Documentation"
-  ("f" cider-code "functional")
-  ("g" cider-grimoire "grimoire")
-  ("w" cider-grimoire-web "web examples")
-  ("c" clojure-cheatsheet "cheatsheet")
-  ("d" dash-at-point "dash"))
-
-
 
 (provide 'init-clojure)
